@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,7 @@ namespace sample1
              .AddJsonFile("appsettings.json", false)
              .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
              .AddEnvironmentVariables()
+             .AddAzureKeyVault(new Uri($"https://ep-keyvault-test-2487.vault.azure.net/"), new DefaultAzureCredential())
              .Build();
 
             var config = configuration.GetConnectionString("DefaultConnection");
