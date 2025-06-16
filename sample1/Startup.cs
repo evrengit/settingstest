@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace sample1
 {
@@ -25,18 +20,18 @@ namespace sample1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Prefer connection string from Azure App Service's special tab ("Connection strings")
-            // Environment variable will be named: SQLCONNSTR_<name> (e.g., SQLCONNSTR_DefaultConnection)
-            string azureSqlConnectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_DefaultConnection");
-            if (string.IsNullOrEmpty(azureSqlConnectionString))
-            {
-                // Fallback to appsettings.json or other configuration
-                azureSqlConnectionString = Configuration.GetConnectionString("DefaultConnection");
-            }
-            // Example usage: services.AddDbContext<MyDbContext>(options => options.UseSqlServer(azureSqlConnectionString));
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+             .AddJsonFile("appsettings.json", false)
+             .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+             .AddEnvironmentVariables()
+             .Build();
 
-Console.WriteLine($"Using connection string: {azureSqlConnectionString}");
+            var config = configuration.GetConnectionString("DefaultConnection");
+            Console.WriteLine($"Connection String: {config}");
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
