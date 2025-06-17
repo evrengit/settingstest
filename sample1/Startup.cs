@@ -22,16 +22,19 @@ namespace sample1
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-             .AddJsonFile("appsettings.json", false)
-             .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-             .AddEnvironmentVariables()
-             .AddAzureKeyVault(new Uri($"https://ep-keyvault-test-2487.vault.azure.net/"), new DefaultAzureCredential())
-             .Build();
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
 
-            var config = configuration.GetConnectionString("DefaultConnection");
-            Console.WriteLine($"Connection String: {config}");
+            if (string.Equals(environment, "Production", StringComparison.OrdinalIgnoreCase))
+            {
+                var keyVaultEndpoint = new Uri("https://ep-keyvault-test-2487.vault.azure.net/");
+                configBuilder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+            }
+
+            IConfigurationRoot configuration = configBuilder.Build();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
