@@ -24,7 +24,7 @@ namespace sample1.Controllers
         [HttpGet]
         public string Get()
         {
-            return _configuration.GetConnectionString("DefaultConnection").ToString();
+            return $"Connection: {_configuration.GetConnectionString("DefaultConnection")} Env: {U.Environment}";
         }
     }
 }

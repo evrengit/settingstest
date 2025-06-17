@@ -28,7 +28,9 @@ namespace sample1
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            if (string.Equals(environment, "Production", StringComparison.OrdinalIgnoreCase))
+            U.Environment = environment;
+
+            if (string.Equals(environment,string.Empty, StringComparison.OrdinalIgnoreCase))
             {
                 var keyVaultEndpoint = new Uri("https://ep-keyvault-test-2487.vault.azure.net/");
                 configBuilder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
