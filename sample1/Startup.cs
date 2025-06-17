@@ -24,16 +24,16 @@ namespace sample1
 
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             U.Environment = environment;
 
-            if (string.Equals(environment,string.Empty, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(environment))
             {
                 var keyVaultEndpoint = new Uri("https://ep-keyvault-test-2487.vault.azure.net/");
                 configBuilder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+
+                 U.Environment = "empty. env condition keyvault";
             }
 
             IConfigurationRoot configuration = configBuilder.Build();
